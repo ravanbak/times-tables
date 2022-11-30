@@ -3,7 +3,7 @@ body {
     flex-direction: column;
     box-sizing: border-box;
     margin: 0 auto;
-    background-color:aquamarine;
+    background-color: aliceblue;
     max-width: 600px;
 }
 
@@ -36,6 +36,7 @@ body {
     align-items: center;
     font-family: 'Consolas', Courier, monospace; 
     font-size: 12rem;
+    font-weight: bold;
     background-color: lightgray;
     border: 9px solid orange;
     border-radius: 10px;
