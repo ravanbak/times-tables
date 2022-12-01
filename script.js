@@ -4,6 +4,8 @@
 
 // import { createElement } from "./dom-util";
 
+let questionCount = 0;
+
 const FACTOR_1_MIN = 2;
 const FACTOR_1_MAX = 12;
 const FACTOR_2_MIN = 2;
@@ -34,15 +36,15 @@ function createElements() {
             tag: 'h1',
             textContent: 'Mathinator 2000',
         };
-
         header.appendChild(createElement(headingProps));
+        header.appendChild(createElement({tag: 'div', classList:['question-number']}));
     }
 
     function createCard() {
         const card = createElement({tag: 'div', classList: ['card']});
         card.addEventListener('mousedown', (e) => { updateCard(); e.preventDefault(); });
         page.appendChild(card);
-
+        
         addQuestionElements(card);
         addAnswerElements(card);
         // addNextButton();
@@ -175,6 +177,10 @@ function checkFactors(factors) {
 }
 
 function updateQuestion() {
+    questionCount++;
+    const questionNumber = document.querySelector('.question-number');
+    questionNumber.textContent = `Question ${questionCount}`;
+
     let factors = getRandomFactors();
 
     // check for repeats or product too small
