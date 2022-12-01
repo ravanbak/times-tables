@@ -9,19 +9,24 @@ const FACTOR_1_MAX = 12;
 const FACTOR_2_MIN = 2;
 const FACTOR_2_MAX = 12;
 
-const factors1 = [2, 4, 6, 8, 12];
-const factors2 = [3, 5, 7, 9, 11];
-let currentFactors = getFactors();
+const DEFAULT_FACTORS = [2, 3, 4, 5, 6, 7, 8, 9, 11, 12];
+
+let minProduct = 15; // avoid showing factors with a product less than this number
+let factors1 = [...DEFAULT_FACTORS];
+let factors2 = [...DEFAULT_FACTORS];
+let currentFactors = getRandomFactors();
 
 const header = document.querySelector('#header');
 const page = document.querySelector('#page');
 const footer = document.querySelector('#footer');
 
-let state = 'q'; // question/answer state, either 'q' or 'a'
+// question/answer state, either 'q' or 'a'
+let state = 'q'; 
 
 function createElements() {
     createHeader();
     createCard();
+    createSettings();
     createFooter();
     
     function createHeader() {
@@ -35,7 +40,7 @@ function createElements() {
 
     function createCard() {
         const card = createElement({tag: 'div', classList: ['card']});
-        card.addEventListener('click', updateCard);
+        card.addEventListener('mousedown', (e) => { updateCard(); e.preventDefault(); });
         page.appendChild(card);
 
         addQuestionElements(card);
@@ -90,6 +95,24 @@ function createElements() {
         }
     }
 
+    function createSettings() {
+        const settingsContainer = createElement({tag: 'div', classList: ['settings-container', 'hidden']});
+
+        const labelFactor1 = createElement({tag: 'label', for: 'factor1input', textContent: 'Factor list 1:'});
+        settingsContainer.appendChild(labelFactor1);
+        const intputFactor1 = createElement({tag: 'input', type: 'text', classList: ['settings-input1'], value: factors1.toString()});
+        intputFactor1.addEventListener('focusout', getFactorsFromUserInput);
+        settingsContainer.appendChild(intputFactor1);
+
+        const labelFactor2 = createElement({tag: 'label', for: 'factor2input', textContent: 'Factor list 2:'});
+        settingsContainer.appendChild(labelFactor2);
+        const intputFactor2 = createElement({tag: 'input', type: 'text', classList: ['settings-input2'],  value: factors2.toString()});
+        intputFactor2.addEventListener('focusout', getFactorsFromUserInput);
+        settingsContainer.appendChild(intputFactor2);
+        
+        page.appendChild(settingsContainer);
+    }
+
     function createFooter() {
         const footerProps = {
             tag: 'span',
@@ -122,16 +145,44 @@ function showAnswer() {
     answer.textContent = getAnswer();
 }
 
+function getProduct(factors) {
+    return factors.f1 * factors.f2;
+}
+
 function getAnswer() {
-    return (currentFactors.f1 * currentFactors.f2).toString();
+    return getProduct(currentFactors).toString();
+}
+
+function checkFactors(factors) {
+    if (factors1.length > 1 && factors.f1 === currentFactors.f1) {
+        return false;
+    }
+
+    if (factors2.length > 1 && factors.f2 === currentFactors.f2) {
+        return false;
+    }
+    
+    const maxFactor1 = factors1.reduce((a, b) => Math.max(a, b));
+    const maxFactor2 = factors2.reduce((a, b) => Math.max(a, b));
+    const maxProduct = maxFactor1 * maxFactor2;
+    if (maxProduct >= minProduct) {
+        if (getProduct(factors) < minProduct) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 function updateQuestion() {
-    let factors = getFactors();
+    let factors = getRandomFactors();
 
-    // check for repeats
-    if ((factors.f1 === currentFactors.f1) || (factors.f2 === currentFactors.f2)) {
-        factors = getFactors();           
+    // check for repeats or product too small
+    for (let i = 0; i < 20; i++) {
+        if (checkFactors(factors)) {
+            break;
+        }
+        factors = getRandomFactors();
     }
 
     currentFactors = factors;
@@ -164,7 +215,50 @@ function fillFactorArrays() {
     }
 }
 
-function getFactors() {
+function fixFactorArray(factors) {
+    // Remove non-integer elements. If there are no
+    // elements remaining, reset the array to default values.
+    //
+    // Return the modified array.
+
+    if (!factors) {
+        return [...DEFAULT_FACTORS];
+    }
+
+    // Filter out any non-integer array elements
+    let inputFactors = factors.filter((el) => Number.isInteger(+el)).map(el => +el);
+    if (inputFactors.length > 0) {
+        return inputFactors;
+    } else {
+        return [...DEFAULT_FACTORS];
+    }
+}
+
+function getFactorArrayFromUserInput(arrayNumber) {
+    let factors = [];
+    
+    const textInput = document.querySelector(`.settings-input${arrayNumber}`);
+    if (textInput) {
+        factors = textInput.value.replaceAll(' ', '').split(',');
+    }
+
+    factors = fixFactorArray(factors)
+
+    if (textInput) {
+        textInput.value = factors.toString();
+    }
+
+    return factors;
+}
+
+function getFactorsFromUserInput() {
+    factors1 = getFactorArrayFromUserInput(1);
+    factors2 = getFactorArrayFromUserInput(2);
+}
+
+function getRandomFactors() {
+    getFactorsFromUserInput();
+
     return {
         f1: factors1[getRandomIndex(factors1)], 
         f2: factors2[getRandomIndex(factors2)]
@@ -172,7 +266,5 @@ function getFactors() {
 }
 
 // fillFactorArrays();
-
-// let {f1, f2} = getFactors();
 
 createElements();

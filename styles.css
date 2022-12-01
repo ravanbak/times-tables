@@ -5,12 +5,12 @@ body {
     margin: 0 auto;
     background-color: aliceblue;
     max-width: 600px;
+    font-family: 'Consolas', Courier, monospace; 
 }
 
 #header {
     margin: 0 20px;
     text-align: center;
-    font-family: 'Consolas', Courier, monospace; 
     min-height: 10vh;
 }
 
@@ -18,7 +18,7 @@ body {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    min-height: 80vh;
+    min-height: 60vh;
 }
 
 .btn-next {
@@ -78,6 +78,31 @@ body {
 
 .question-op {
     margin: -60px 0;
+}
+
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    flex-grow: 1;
+    background-color: hsl(195, 53%, 88%);
+    padding: 10px 20px;
+    margin: 10px 20px 0;
+    border: solid 1px darkgray;
+    border-radius: 10px;
+}
+
+.settings-container input {
+    width: 100%;
+    border-radius: 5px;
+    border: none;
+    padding: 4px;
+    background-color: rgba(252, 252, 252, 0.858);
+}
+
+.settings-container label {
+    font-weight: bold;
 }
 
 #footer {
